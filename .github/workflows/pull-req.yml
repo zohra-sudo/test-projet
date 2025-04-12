@@ -1,32 +1,29 @@
-name: Automatisation PR de auto-backend-update vers feature-test
+name: Auto PR on Main
 
-# Déclencher le workflow à chaque push sur la branche auto-backend-update
 on:
   push:
     branches:
-      - auto-backend-update
+      - feature-test
+    paths:
+      - 'backend/**'
 
 jobs:
-  create-pull-request-from-auto-backend-update:
+  create-pr:
     runs-on: ubuntu-latest
-    steps:
-      # Étape 1 : Récupérer le code du dépôt
-      - name: Checkout du code
-        uses: actions/checkout@v3
 
-      # Étape 2 : Créer le pull request de auto-backend-update vers master
-      - name: Créer le Pull Request
-        uses: peter-evans/create-pull-request@v5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          commit-message: "Changements de auto-backend-update vers master"
-          title: "PR Auto : Intégration de auto-backend-update dans master"
-          body: |
-            Cette PR a été créée automatiquement par GitHub Actions.
-            Elle intègre les changements de la branche auto-backend-update (incluant src/index.js) dans master.
-            Vérifiez les modifications avant de fusionner.
-          branch: "auto-backend-update-${{ github.run_id }}"  # Créer une nouvelle branche automatiquement (évite le conflit)
-          base: feature-test  # Branche cible (où fusionner les changements)
-          labels: "automatisé, intégration"
-          delete-branch: true  # Supprimer la branche après fusion
+          fetch-depth: 0
+
+      - name: Create Pull Request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH_NAME="review-main-$(date +%s)"
+          git checkout -b $BRANCH_NAME
+          git push origin $BRANCH_NAME
+          gh pr create --title "Review changes on main" --body "Auto PR for push to main" --base feature-test --head $BRANCH_NAME
 
 
