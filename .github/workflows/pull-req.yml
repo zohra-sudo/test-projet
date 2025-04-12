@@ -10,20 +10,24 @@ on:
 jobs:
   create-pr:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Pull Request
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          BRANCH_NAME="review-main-$(date +%s)"
+          BRANCH_NAME="review-$(date +%s)"
           git checkout -b $BRANCH_NAME
           git push origin $BRANCH_NAME
-          gh pr create --title "Review changes on main" --body "Auto PR for push to main" --base feature-test --head $BRANCH_NAME
+          gh pr create --title "Auto PR for push to main" --body "Created to review changes pushed to main" --base main --head $BRANCH_NAME
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
