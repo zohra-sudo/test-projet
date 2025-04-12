@@ -1,0 +1,30 @@
+name: Create Pull Request from test to feature-test
+
+# Déclencher le workflow à chaque fois qu'une branche 'test' est poussée
+on:
+  push:
+    branches:
+      - 'test'   # Le workflow sera déclenché lorsque 'test' est poussé
+
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Étape 1 : Récupérer le code du dépôt
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Étape 2 : Créer le Pull Request de 'test' vers 'feature-test'
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: "Création automatique du Pull Request de test vers feature-test"
+          title: "Automatisation PR : Merge de test vers feature-test"
+          body: |
+            Ce pull request est créé automatiquement par GitHub Actions.
+            Il contient les changements de la branche test vers la branche feature-test.
+            Vérifiez les modifications avant de fusionner.
+          branch: test  # Branche source (celle qui a été poussée)
+          base: feature-test  # Branche cible (où fusionner)
+          labels: "automatisé, pr"
