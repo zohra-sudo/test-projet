@@ -18,3 +18,4 @@ services:
       DB_PASSWORD: 12345
     depends_on:
       - db
+
